@@ -22,7 +22,8 @@ cd ~/Documents/Hytale/mymod
 | `template` | `mymod` | package `com.riprod.mymod`, artifact id, shaded-lib package |
 | `__DESCRIPTION__` | your description | gradle.properties, manifest.json, README |
 
-It also creates a git repo (`main` branch) if there isn't one. It doesn't commit anything.
+It also deletes the template's `.git` (history and remote) and any copied `bin/`, `build/` and `.gradle/`,
+then creates a fresh git repo on `main` with nothing committed. Add your own remote after.
 
 ## After init
 

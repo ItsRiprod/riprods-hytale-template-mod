@@ -45,9 +45,10 @@ mv src/main/java/com/riprod/template "src/main/java/com/riprod/$LOWER"
 
 rm -f TEMPLATE.md init.sh
 
-if [[ ! -d .git ]]; then
-    git init -q -b main
-fi
+# Start fresh: drop the template's git history/remote and any stale build output copied along.
+rm -rf .git bin build .gradle
+git init -q -b main
 
-echo "Initialised $NAME (package com.riprod.$LOWER)."
+echo "Initialised $NAME (package com.riprod.$LOWER) with a fresh git repo on 'main'."
 echo "Next: fill in publishing IDs in gradle.properties, then ./gradlew build"
+echo "To push: git remote add origin <url> && git add -A && git commit -m 'Initial commit' && git push -u origin main"
