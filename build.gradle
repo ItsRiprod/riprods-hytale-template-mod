@@ -1,0 +1,113 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.4.2'
+    id 'com.azuredoom.hytale-tools' version '1.+'
+    id 'com.azuredoom.hytalepublisher' version '1.+'
+}
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+    maven { url = uri("https://www.cursemaven.com") }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of((project.java_version as String).toInteger())
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+base {
+    archivesName = project.mod_name.toString()
+}
+
+configurations {
+    // Anything added to shadowBundle is compiled against AND shaded into the final jar.
+    shadowBundle
+    implementation.extendsFrom(shadowBundle)
+    testCompileOnly.extendsFrom(compileOnly)
+    testRuntimeOnly.extendsFrom(compileOnly)
+}
+
+dependencies {
+    shadowBundle('com.riprod:configly:1.+')
+    shadowBundle('com.riprod:patchly:3.+')
+}
+
+hytaleTools {
+    javaVersion = project.java_version as Integer
+    hytaleVersion = project.hytale_version.toString()
+    manifestServerVersion = project.manifestServerVersion.toString()
+    manifestGroup = project.manifest_group.toString()
+    modId = project.mod_id.toString()
+    modDescription = project.mod_description.toString()
+    modUrl = project.mod_url.toString()
+    mainClass = project.main_class.toString()
+    modCredits = project.mod_credits.toString()
+    manifestDependencies = project.manifest_dependencies.toString()
+    manifestOptionalDependencies = project.manifest_opt_dependencies.toString()
+    curseforgeId = project.curseforgeID.toString()
+    disabledByDefault = project.disabled_by_default.toString().toBoolean()
+    includesPack = project.includes_pack.toString().toBoolean()
+    patchline = project.patchline.toString()
+
+    debugEnabled = true
+    debugSuspend = false
+
+    requireDcevm = true
+}
+
+// Every platform starts disabled. Fill in its ID in gradle.properties, then flip enabled = true.
+hytalePublisher {
+    version       = project.version
+    releaseType   = "release"
+    changelogFile = "changelog.md"
+    gameVersion   = project.hytale_version.toString()
+
+    modtale {
+        enabled   = false
+        projectId = project.modtale_uuid
+        patchline = project.patchline.toString()
+    }
+
+    curseforge {
+        enabled   = false
+        projectId = project.curseforgeID
+        embeddedLibrary "configly"
+        embeddedLibrary "patchly"
+    }
+
+    modifold {
+        enabled   = false
+        projectId = project.modifold_id
+        embedded "configly"
+        embedded "patchly"
+    }
+
+    github {
+        enabled = false
+
+        // Let GitHub append its auto-generated notes after the changelog body.
+        generateReleaseNotes = true
+        // Attach the built jar, sources jar, and javadoc jar. Sources/javadoc are
+        // skipped automatically (with a warning) if those tasks aren't present.
+        includeJar        = true
+        includeSourcesJar = true
+        includeJavadocJar = true
+    }
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    mergeServiceFiles()
+    configurations = [project.configurations.shadowBundle]
+    // Relocate bundled libs so two mods shipping different versions never clash.
+    relocate('com.riprod.configly', "${project.group}.shaded.configly")
+    relocate('com.riprod.patchly', "${project.group}.shaded.patchly")
+}
+
+tasks.build {
+    dependsOn("shadowJar")
+}

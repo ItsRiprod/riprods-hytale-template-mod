@@ -1,0 +1,22 @@
+{
+    "Group": "Riprod",
+    "Name": "Template",
+    "Version": "0.1.0",
+    "Description": "__DESCRIPTION__",
+    "Authors": [
+        {
+            "Name": "Riprod"
+        }
+    ],
+    "ServerVersion": ">=0.7.0 <0.8.0",
+    "Dependencies": {
+
+    },
+    "OptionalDependencies": {
+
+    },
+    "DisabledByDefault": false,
+    "IncludesAssetPack": false,
+    "Website": "https://github.com/itsriprod/Template",
+    "Main": "com.riprod.template.Template"
+}
